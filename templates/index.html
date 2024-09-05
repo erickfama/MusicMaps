@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Maps of Mexico</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+        }
+        #map { height: 600px; }
+        .custom-label {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+            width: 120px !important;
+            white-space: normal !important;
+            font-family: 'Ubuntu', sans-serif;  /* Add this line */
+        }
+    </style>
+</head>
+<body>
+    <h1>Music Maps</h1>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([23.6345, -102.5528], 5); // Centered on Mexico
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        fetch('/custom_text')
+            .then(response => response.json())
+            .then(customText => {
+                for (let [location, data] of Object.entries(customText)) {
+                    let icon = L.divIcon({
+                        className: 'custom-label',
+                        html: `<strong>${location}</strong><br>${data.text}`,
+                        iconSize: [120, null]
+                    });
+                    L.marker(data.coords, {icon: icon}).addTo(map);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
